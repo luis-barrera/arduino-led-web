@@ -76,14 +76,17 @@ void loop() {
 
   // If there is 4000 steps in counter and have rainbow status on
   if ((rainbow_counter % 4000 == 0) && rainbow_status){
+    // Change value per color
     blue_value += 6;
     red_value += 4;
     green_value += 2;
 
+    // If value is bigger than 255 change it
     if (blue_value > 255){ blue_value -= 512; }
     if (red_value > 255){ red_value -= 512; }
     if (green_value > 255){ green_value -= 512; }
 
+    // Use absolute value to force values between 0 and 255
     analogWrite(RGB_BLUE_PIN, abs(blue_value));
     analogWrite(RGB_RED_PIN, abs(red_value));
     analogWrite(RGB_GREEN_PIN, abs(green_value));

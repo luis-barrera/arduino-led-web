@@ -16,16 +16,26 @@ WiFiServer server(80);
 // Variable that saves petitions from client
 String header;
 
+// Led power status
+char power_status = 0;
+char rainbow_status = 0;
+int rainbow_counter = 0;
+short blue_value = 1;
+short red_value = 31;
+short green_value = 101;
+
 // Content sent to client
 const char *HTML =
  #include "index.html"
 ;
 
 // Prototypes
-void handle_root();
 void led_on();
 void led_off();
-void handle_client(WiFiClient client, String* header);
+void led_toggle();
+void rainbow_mode();
+void handle_client(WiFiClient, String);
+void handle_header(String);
 
 void setup() {
   // Setup pins
@@ -58,13 +68,30 @@ void loop() {
   // If a new client connects
   if (client) {
     // Handle the client and set the headers
-    handle_client(client, &header);
+    handle_client(client, header);
+  }
+
+  // Counter to know if we need to change color in rainbow_mode
+  rainbow_counter++;
+
+  // If there is 4000 steps in counter and have rainbow status on
+  if ((rainbow_counter % 4000 == 0) && rainbow_status){
+    blue_value += 6;
+    red_value += 4;
+    green_value += 2;
+
+    if (blue_value > 255){ blue_value -= 512; }
+    if (red_value > 255){ red_value -= 512; }
+    if (green_value > 255){ green_value -= 512; }
+
+    analogWrite(RGB_BLUE_PIN, abs(blue_value));
+    analogWrite(RGB_RED_PIN, abs(red_value));
+    analogWrite(RGB_GREEN_PIN, abs(green_value));
   }
 }
 
-// TODO
-void handle_client(WiFiClient client, String* header_ptr){
-  String header = *header_ptr;
+// Handle client requests and responses
+void handle_client(WiFiClient client, String header){
   // Make a String to hold incoming data from the client
   String currentLine = "";
 
@@ -95,14 +122,9 @@ void handle_client(WiFiClient client, String* header_ptr){
           client.println();
 
           // Reacts to header's content
-          if (header.indexOf("GET /on") >= 0) {
-            led_on();
-          } else if (header.indexOf("GET /off") >= 0) {
-            led_off();
-          }
+          handle_header(header);
 
-          // TODO: create function that reads header content to display only
-          // one button
+          // Sends html page to client
           client.println(HTML);
 
           // To end the response to client, print an empty line
@@ -130,25 +152,47 @@ void handle_client(WiFiClient client, String* header_ptr){
 }
 
 // Handle contents in header
-void handle_header(String* header_ptr){
-  // Convert ptr to string
-  String header = *header_ptr;
-
+void handle_header(String header){
   // Reacts to header's content
-  if (header.indexOf("GET /on") >= 0) {
-    led_on();
-  } else if (header.indexOf("GET /off") >= 0) {
-    led_off();
+  if (header.indexOf("GET /toggle") >= 0) {
+    led_toggle();
+  } else if (header.indexOf("GET /rainbow") >= 0){
+    rainbow_mode();
   }
 }
 
+// Toggles led power
+void led_toggle(){
+  if (power_status) {
+    power_status = 0;
+    rainbow_status = 0;
+    led_off();
+  } else {
+    power_status = 1;
+    led_on();
+  }
+}
 
+// Turns rainbow_mode on
+void rainbow_mode(){
+  if (rainbow_status) {
+    power_status = 0;
+    rainbow_status = 0;
+    led_off();
+  } else {
+    power_status = 1;
+    rainbow_status = 1;
+  }
+}
+
+// Turns led on
 void led_on() {
   analogWrite(RGB_BLUE_PIN, 255);
   analogWrite(RGB_RED_PIN, 255);
   analogWrite(RGB_GREEN_PIN, 255);
 }
 
+// Turns led off
 void led_off() {
   analogWrite(RGB_BLUE_PIN, 0);
   analogWrite(RGB_RED_PIN, 0);

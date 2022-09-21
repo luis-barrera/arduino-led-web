@@ -7,42 +7,64 @@ R"=====(
 
   <style>
   html { 
-      font-family: Helvetica;
-      display: inline-block;
-      margin: 0px auto;
-      text-align: center;
+    font-family: Helvetica;
+    display: inline-block;
+    margin: 0px auto;
+    text-align: center;
   }
   .button { 
-      background-color: #4CAF50;
-      border: none;
-      color: white;
-      padding: 16px 40px;
-      text-decoration: none; 
-      font-size: 30px; 
-      margin: 2px; 
-      cursor: pointer;
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 16px 40px;
+    text-decoration: none; 
+    font-size: 30px; 
+    margin: 2px; 
+    cursor: pointer;
+  }
+  .button:hover { 
+    background-color: #d0eed1;
+    color: rgb(0, 0, 0);
+    transition: 1s;
   }
   .button2 {
-      background-color: #555555;
+    border: none;
+    color: white;
+    padding: 16px 40px;
+    text-decoration: none; 
+    font-size: 30px; 
+    margin: 2px; 
+    cursor: pointer;
+    background: linear-gradient(
+        90deg,
+        rgba(255, 0, 0, 1) 0%,
+        rgba(255, 154, 0, 1) 10%,
+        rgba(208, 222, 33, 1) 20%,
+        rgba(79, 220, 74, 1) 30%,
+        rgba(63, 218, 216, 1) 40%,
+        rgba(47, 201, 226, 1) 50%,
+        rgba(28, 127, 238, 1) 60%,
+        rgba(95, 21, 242, 1) 70%,
+        rgba(186, 12, 248, 1) 80%,
+        rgba(251, 7, 217, 1) 90%,
+        rgba(255, 0, 0, 1) 100%
+    );
   }
   </style>
 </head>
 
 <body>
-  <h1>ESP32 Web Server</h1>
-  <button class="button" onclick="on();">ON</button>
-  <button class="button button2" onclick="off();">OFF</button>
+  <h1>Lampara ESP32</h1>
+  <button class="button" onclick="send('toggle');">Toggle Power</button>
+  <br/>
+  <button class="button2" onclick="send('rainbow');">Rainbow Mode</button>
 
   <script>
     let xhr = new XMLHttpRequest()
-    function on(){
 
-      xhr.open("GET", "/on", true);
-      xhr.send(null);
-    }
+    function send(cmd){
 
-    function off(){
-      xhr.open("GET", "/off", true);
+      xhr.open("GET", "/" + cmd, true);
       xhr.send(null);
     }
   </script>

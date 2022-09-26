@@ -18,8 +18,11 @@ String header;
 
 // Led power status
 char power_status = 0;
+// Is the rainbow_mode active? 0 for not, 1 for yes
 char rainbow_status = 0;
+// Counter that help us to decise when to change de color in rainbow_mode
 int rainbow_counter = 0;
+// Initial values for heach color to make it more dinamic
 short blue_value = 1;
 short red_value = 31;
 short green_value = 101;
@@ -58,7 +61,7 @@ void setup() {
   // Starts the web server
   server.begin();
 
-  delay(100); 
+  delay(100);
 }
 
 void loop() {
@@ -109,7 +112,7 @@ void handle_client(WiFiClient client, String header){
 
       // Adds client's data to header variable
       header += header + c;
-      
+
       // If the byte is a newline character
       if (c == '\n') {
       // If the current line is blank, you got two newline characters in a row
@@ -136,7 +139,7 @@ void handle_client(WiFiClient client, String header){
           // Break connection to client
           break;
 
-        // Cleans contens readed from client
+        // Cleans contents readed from client
         } else {
           currentLine = "";
         }
